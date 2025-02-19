@@ -12,9 +12,6 @@ inputs:
   third-user:
     description: 'username who inserting his/her PAT'
     required: false
-  access-token:
-    description: 'PAT with repository scope (https://github.com/settings/tokens)'
-    required: false
   depth:
     description: 'Depth of the clone (default: full history)'
     required: false
@@ -27,13 +24,17 @@ inputs:
     description: 'Clone with submodules'
     required: false
     default: "false" 
+secrets:
+  access-token:
+    description: 'PAT with repository scope (https://github.com/settings/tokens)'
+    required: false
 
 runs:
   using: 'composite'
   steps:
     - name: Clone repository
       run: |
-        if [ -z "${{ inputs.access-token }}" ]; then
+        if [ -z "${{ secrets.access-token }}" ]; then
           if [ -z "${{ inputs.depth }}" ]; then
             if [ "${{ inputs.submodule }}" = "true" ]; then
               git clone --branch "${{ inputs.branch }}" https://github.com/${{ inputs.owner }}/${{ inputs.repository }}.git  --recursive
@@ -50,15 +51,15 @@ runs:
         else
           if [ -z "${{ inputs.depth }}" ]; then
             if [ "${{ inputs.submodule }}" = "true" ]; then
-              git clone --branch "${{ inputs.branch }}" https://${{ inputs.third-user }}:${{ inputs.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.repository }}.git  --recursive
+              git clone --branch "${{ inputs.branch }}" https://${{ inputs.third-user }}:${{ secrets.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.repository }}.git  --recursive
             else
-              git clone --branch "${{ inputs.branch }}" https://${{ inputs.third-user }}:${{ inputs.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.repository }}.git
+              git clone --branch "${{ inputs.branch }}" https://${{ inputs.third-user }}:${{ secrets.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.repository }}.git
             fi
           else
             if [ "${{ inputs.submodule }}" = "true" ]; then
-              git clone --branch "${{ inputs.branch }}" --depth="${{ inputs.depth }}" https://${{ inputs.third-user }}:${{ inputs.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.repository }}.git  --recursive
+              git clone --branch "${{ inputs.branch }}" --depth="${{ inputs.depth }}" https://${{ inputs.third-user }}:${{ secrets.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.repository }}.git  --recursive
             else
-              git clone --branch "${{ inputs.branch }}" --depth="${{ inputs.depth }}" https://${{ inputs.third-user }}:${{ inputs.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.repository }}.git
+              git clone --branch "${{ inputs.branch }}" --depth="${{ inputs.depth }}" https://${{ inputs.third-user }}:${{ secrets.access-token }}@github.com/${{ inputs.owner }}/${{ inputs.repository }}.git
             fi
           fi
         fi
